@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
+     _ = require('lodash'),
   User = mongoose.model('User'),
   async = require('async'),
   config = require('meanio').loadConfig(),
@@ -41,6 +42,31 @@ exports.signout = function(req, res) {
  */
 exports.session = function(req, res) {
   res.redirect('/');
+};
+
+
+/* Update user*/
+
+exports.update = function(req,res) {
+
+  var user = req.user;
+  // for security we will delete roles from req
+  delete req.body.roles;
+  if (user) {
+    user = _.extend(user, req.body);
+    user.updated =  Date.now();
+
+    user.save(function(err) {
+     if (err) {
+      return res.json(500, {
+        error: 'Cannot update the user'
+      });
+    }
+    res.json(user);
+
+    });
+
+  }  
 };
 
 /**
