@@ -176,4 +176,35 @@ angular.module('mean.users')
           });
       };
     }
+  ])
+  .controller('ResetProfileCtrl', ['$scope', '$rootScope', '$http', '$location', '$stateParams', 'Global', 'Users','MeanUser','Authentication',
+    function($scope, $rootScope, $http, $location, $stateParams, Global, Users,MeanUser,Authentication) {
+      $scope.global = Global;
+       $scope.user = Authentication.user;     
+       $scope.hasAuthorization = function(article) {
+        if (!$scope.user) return false;
+        return $scope.user._id === $scope.global.user._id;
+      }; 
+
+      // Update a user profile
+      $scope.updateUserProfile = function(isValid) {
+      if (isValid) {
+        var user = new MeanUser($scope.user);
+        if (!user.updated) {
+          user.updated = [];
+        }
+        user.updated.push(new Date().getTime());
+
+        user.$update(function() {
+          $location.path('profile');
+          $scope.success = true;
+        });
+      } else {
+        $scope.submitted = true;
+      }
+    };
+    
+    }
   ]);
+
+
